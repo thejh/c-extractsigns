@@ -1,10 +1,12 @@
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include "lib/cNBT/nbt.h"
 #include "lib/cNBT/list.h"
 #include <string.h>
-#include <netinet/in.h>
+#include <dirent.h>
 
 #define INDEX_BYTES 4096
 #define COLUMN_GRID_SIZE 4096
@@ -42,13 +44,7 @@ static char* read_bytes_from_file(FILE *file, size_t length) {
 	return buf;
 }
 
-int main(int argc, char **argv) {
-	if (argc != 2) {
-		puts("FAIL: Please specify exactly one argument!");
-		return 1;
-	}
-	
-	char *path = argv[1];
+void handle_file(char* path) {
 	FILE *file = fopen(path, "r");
 	char *raw_column_list = malloc(INDEX_BYTES);
 	assert(fread(raw_column_list, 1, INDEX_BYTES, file) == INDEX_BYTES);
@@ -147,4 +143,33 @@ int main(int argc, char **argv) {
 			nbt_free(column_node);
 		}
 	}
+	assert(fclose(file) == 0);
+}
+
+static int ends_with(char* text, char* end) {
+	int textlen = strlen(text);
+	int endlen = strlen(end);
+	if (endlen > textlen) return -1;
+	return strcmp(text+(textlen - endlen), end) == 0;
+}
+
+int main(int argc, char **argv) {
+	if (argc != 2) {
+		puts("FAIL: Please specify exactly one argument!");
+		return 1;
+	}
+	
+	char *folder = argv[1];
+	struct dirent *ep;
+	char *filename;
+	DIR *dp = opendir(folder);
+	assert(dp != NULL);
+	while (ep = readdir(dp)) {
+		assert(asprintf(&filename, "%s/%s", folder, ep->d_name) != -1);
+		if (ends_with(filename, ".mca")) {
+			handle_file(filename);
+		}
+		free(filename);
+	}
+	closedir(dp);
 }
