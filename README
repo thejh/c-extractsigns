@@ -1,0 +1,18 @@
+compiling:
+
+    git submodule init
+    git submodule update
+    make
+
+usage:
+
+    $ ./extractsigns ~/software/minecraft-server/world/region
+    found a sign at (-282|64|185)
+    ABCDEFGHIJKLMNO
+    012345678901234
+    abcdefghijklmno
+    qwertzuiopqwert
+    
+If there are more signs, all of them will be printed, with empty lines as seperators.
+
+Instead of `region`, use `DIM1` for The End and `DIM-1` for the nether.
