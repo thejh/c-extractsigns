@@ -42,19 +42,6 @@ static char* read_bytes_from_file(FILE *file, size_t length) {
 	return buf;
 }
 
-static int32_t change_int32_endianness(int32_t in_num) {
-  unsigned char* in_data = &in_num;
-  int32_t out_num;
-  unsigned char* out_data = &out_num;
-  
-  out_data[0] = in_data[3];
-  out_data[1] = in_data[2];
-  out_data[2] = in_data[1];
-  out_data[3] = in_data[0];
-  
-  return out_num;
-}
-
 int main(int argc, char **argv) {
 	if (argc != 2) {
 		puts("FAIL: Please specify exactly one argument!");
